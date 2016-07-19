@@ -133,6 +133,28 @@
       rsyslog_client_config_name: "99-aodh-rsyslog-client.conf"
       tags:
         - "aodh-rsyslog-client"
+  post_tasks:
+    - name: Ensure uwsgi directories exist
+      file: path={{ item }} state=directory mode=0771
+      with_items:
+            - '/etc/uwsgi/'
+            - '/etc/uwsgi/wsgi'
+    - name: Ensure system package dependencies for uwsgi
+      apt: pkg={{ item }}
+      with_items:
+        - build-essential
+        - python-dev
+    - name: Install uwsgi server
+      pip: name=uwsgi virtualenv='/openstack/venvs/uwsgi'
+    - name: Apply service wsgi configuration
+      file: src={{ uwsgi_wsgi_file }} dest=/etc/uwsgi/wsgi/{{ uwsgi_service_name }}.wsgi state=link
+    - name: Apply wsgi configuration
+      copy: src='files/{{ uwsgi_config_file }}' dest='/etc/uwsgi/{{ uwsgi_config_file }}' mode=0774
+    - name: Apply upstart configuration for uwsgi
+      template: src='files/uwsgi_upstart.conf.j2' dest='/etc/init/uwsgi.conf' mode=0770
+    - name: Ensure uwsgi service started
+      service: name=uwsgi state=restarted
+
   vars:
     is_metal: "{{ properties.is_metal|default(false) }}"
     aodh_rabbitmq_userid: aodh
@@ -141,3 +163,6 @@
     aodh_rabbitmq_port: "{{ rabbitmq_port }}"
     aodh_rabbitmq_use_ssl: "{{ rabbitmq_use_ssl }}"
     pip_lock_to_internal_repo: "{{ (pip_links | length) >= 1 }}"
+    uwsgi_service_name: aodh
+    uwsgi_wsgi_file: '/openstack/venvs/aodh-master/lib/python2.7/site-packages/aodh/api/app.wsgi'
+    uwsgi_config_file: 'aodh-uwsgi.ini'

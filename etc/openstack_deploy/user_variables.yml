@@ -184,3 +184,13 @@ debug: false
 # variable to 'true'.
 # Docs: http://docs.openstack.org/developer/openstack-ansible-security/
 # apply_security_hardening: true
+
+aodh_pip_packages:
+  - "aodh[mysql]"
+  - python-ceilometerclient
+  - ceilometermiddleware
+  - python-memcached
+  - pycrypto
+  - warlock
+  - PyMySQL
+  - uWSGI

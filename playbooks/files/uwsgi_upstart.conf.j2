@@ -1,0 +1,7 @@
+description "uwsgi"
+start on runlevel [2345]
+stop on runlevel [06]
+
+respawn
+
+exec /openstack/venvs/uwsgi/bin/uwsgi --ini /etc/uwsgi/{{ uwsgi_config_file }}
