@@ -11,7 +11,6 @@ The Telemetry (ceilometer) alarming services perform the following functions:
     samples.
 
 
-
 Configuring the hosts
 ~~~~~~~~~~~~~~~~~~~~~
 
@@ -57,6 +56,5 @@ Run the ``os-aodh-install.yml`` playbook. If deploying a new OpenStack
 (instead of only Aodh), run ``setup-openstack.yml``.
 The Aodh playbooks run as part of this playbook.
 
---------------
 
 .. include:: navigation.txt

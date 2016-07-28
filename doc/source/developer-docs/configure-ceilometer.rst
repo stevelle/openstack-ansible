@@ -20,68 +20,6 @@ The Telemetry module (ceilometer) performs the following functions:
    services. For configuring these services, see the aodh docs:
    http://docs.openstack.org/developer/aodh/
 
-Configure a MongoDB backend prior to running the ceilometer playbooks.
-The connection data is in the ``user_variables.yml`` file
-(see section `Configuring the user data`_ below).
-
-
-Setting up a MongoDB database for ceilometer
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-1. Install the MongoDB package:
-
-  .. code-block:: console
-
-     # apt-get install mongodb-server mongodb-clients python-pymongo
-
-2. Edit the ``/etc/mongodb.conf`` file and change the ``bind_i`` to the
-   management interface:
-
-  .. code-block:: ini
-
-     bind_ip = 10.0.0.11
-
-3. Edit the ``/etc/mongodb.conf`` file and enable ``smallfiles``:
-
-  .. code-block:: ini
-
-     smallfiles = true
-
-4. Restart the MongoDB service:
-
-  .. code-block:: console
-
-     # service mongodb restart
-
-5. Create the ceilometer database:
-
-  .. code-block:: console
-
-     # mongo --host controller --eval 'db = db.getSiblingDB("ceilometer"); db.addUser({user: "ceilometer", pwd: "CEILOMETER_DBPASS", roles: [ "readWrite", "dbAdmin" ]})'
-
-  This returns:
-
-  .. code-block:: console
-
-     MongoDB shell version: 2.4.x
-     connecting to: controller:27017/test
-      {
-       "user" : "ceilometer",
-       "pwd" : "72f25aeee7ad4be52437d7cd3fc60f6f",
-       "roles" : [
-        "readWrite",
-        "dbAdmin"
-       ],
-       "_id" : ObjectId("5489c22270d7fad1ba631dc3")
-      }
-
-  .. note::
-
-     Ensure ``CEILOMETER_DBPASS`` matches the
-     ``ceilometer_container_db_password`` in the
-     ``/etc/openstack_deploy/user_secrets.yml`` file. This is
-     how Ansible knows how to configure the connection string
-     within the ceilometer configuration files.
 
 Configuring the hosts
 ~~~~~~~~~~~~~~~~~~~~~
@@ -156,27 +94,6 @@ example of ``ceilometer_ceilometer_conf_overrides``:
        backend_url: "zookeeper://172.20.1.110:2181"
      notification:
        workload_partitioning: True
-
-
-Configuring the user data
-~~~~~~~~~~~~~~~~~~~~~~~~~
-
-Specify the following configurations in the
-``/etc/openstack_deploy/user_variables.yml`` file:
-
-  - The type of database backend ceilometer uses. Currently only
-    MongoDB is supported: ``ceilometer_db_type: mongodb``
-
-  - The IP address of the MongoDB host: ``ceilometer_db_ip:
-    localhost``
-
-  - The port of the MongoDB service: ``ceilometer_db_port: 27017``
-
-
-Run the ``os-ceilometer-install.yml`` playbook. If deploying a new OpenStack
-(instead of only ceilometer), run ``setup-openstack.yml``. The
-ceilometer playbooks run as part of this playbook.
-
 
 --------------
 
